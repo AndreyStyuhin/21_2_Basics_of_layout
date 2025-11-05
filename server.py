@@ -1,24 +1,47 @@
 import http.server
 import socketserver
-from urllib.parse import parse_qs  # Мы будем использовать только этот модуль
+from urllib.parse import parse_qs
 
 # Определяем порт, на котором будет работать сервер
 PORT = 8000
-CONTACTS_PAGE = 'contacts.html'
 
+# 1. СЛОВАРЬ МАРШРУТОВ (ОБНОВЛЕН)
+# Сопоставляет URL-пути с именами файлов
+ROUTES = {
+    '/': 'index.html',              # Главная страница
+    '/index': 'index.html',
+    '/category': 'category.html',   # Страница категорий
+    '/catalog': 'catalog.html',     # Страница каталога
+    '/contacts': 'contacts.html',   # Страница контактов
+    '/orders': 'orders.html',       # <<< ДОБАВЛЕН НОВЫЙ МАРШРУТ
+}
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         """
-        Обработчик GET-запросов.
-        Задание 2: На любой GET-запрос возвращать страницу «Контакты».
+        Обработчик GET-запросов с маршрутизацией.
+        Теперь отдает разные HTML-файлы в зависимости от URL.
         """
-        print(f"Получен GET-запрос для: {self.path}")
+        request_path = self.path
+        print(f"Получен GET-запрос для: {request_path}")
+
+        # 2. ОПРЕДЕЛЕНИЕ ИМЕНИ ФАЙЛА
+        # Проверяем, есть ли запрошенный путь в нашем словаре маршрутов
+        if request_path in ROUTES:
+            file_to_serve = ROUTES[request_path]
+        elif request_path.endswith('.html') and request_path[1:] in ROUTES.values():
+            # Это позволяет также открывать файлы напрямую (например, /index.html)
+            file_to_serve = request_path[1:]
+        else:
+            # Если маршрут не найден, отправляем 404
+            self.send_error(404, "Страница не найдена")
+            return
 
         try:
-            # Пытаемся открыть и прочитать файл 'contacts.html'
-            with open(CONTACTS_PAGE, 'rb') as file:
+            # 3. ОТПРАВКА ФАЙЛА
+            # Пытаемся открыть и прочитать соответствующий HTML-файл
+            with open(file_to_serve, 'rb') as file:
                 content = file.read()
 
             # Отправляем код ответа 200 (ОК)
@@ -31,9 +54,9 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(content)
 
         except FileNotFoundError:
-            # Если файл не найден, отправляем ошибку 404
-            print(f"Ошибка: Файл {CONTACTS_PAGE} не найден.")
-            self.send_error(404, "Файл не найден")
+            # Если файл из словаря не найден на диске
+            print(f"Ошибка: Файл {file_to_serve} не найден на диске.")
+            self.send_error(404, f"Файл {file_to_serve} не найден")
         except Exception as e:
             # Обработка других возможных ошибок
             print(f"Произошла ошибка: {e}")
@@ -41,9 +64,8 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         """
-        Обработчик POST-запросов.
-        Дополнительное задание: принять POST-запрос и напечатать
-        в консоль все данные, которые были приняты.
+        Обработчик POST-запросов остается без изменений.
+        Он по-прежнему печатает данные в консоль.
         """
         print(f"\nПолучен POST-запрос для: {self.path}")
 
@@ -53,24 +75,19 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
             # Читаем тело запроса
             post_data_bytes = self.rfile.read(content_length)
-
-            # Декодируем байты в строку
             post_data_str = post_data_bytes.decode('utf-8')
 
             # --- Печать данных в консоль ---
             print("--- НАЧАЛО ДАННЫХ POST-ЗАПРОСА ---")
             print(f"Сырые данные (raw): {post_data_str}")
 
-            # Парсим данные формы (они приходят в формате 'key1=value1&key2=value2')
-            # Используем urllib.parse.parse_qs - он встроен и работает отлично
             parsed_data = parse_qs(post_data_str)
             print("Разобранные данные (parsed):")
             for key, value in parsed_data.items():
-                print(f"  {key}: {value[0]}")  # value[0] т.к. parse_qs возвращает список
+                print(f"  {key}: {value[0]}")
             print("--- КОНЕЦ ДАННЫХ POST-ЗАПРОСА ---\n")
 
-            # --- Отправляем простой ответ клиенту ---
-            # (чтобы браузер не "завис" в ожидании)
+            # --- Отправляем ответ клиенту ---
             self.send_response(200)
             self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
@@ -80,9 +97,8 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
                 <head><title>Спасибо!</title></head>
                 <body>
                     <h1>Данные получены!</h1>
-                    <p>Мы получили от вас следующие данные:</p>
-                    <pre>{post_data_str}</pre>
-                    <p><a href="/">Вернуться назад</a></p>
+                    <p>Сообщение успешно отправлено. Проверьте консоль PyCharm.</p>
+                    <p><a href="/">Вернуться на главную</a></p>
                 </body>
             </html>
             """
@@ -97,5 +113,6 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
         print(f"Сервер запущен и слушает порт {PORT}")
-        print(f"Перейдите по адресу: http://localhost:{PORT}")
+        print(f"Главная: http://localhost:{PORT}/")
+        print(f"Контакты: http://localhost:{PORT}/contacts")
         httpd.serve_forever()
