@@ -1,4 +1,23 @@
 from django.shortcuts import render
+from .models import Product # 1. Импортируем Product
+
+
+def home(request):
+    # 2. Получаем 5 последних продуктов
+    latest_products = Product.objects.order_by('-created_at')[:5]
+
+    # 3. Выводим в консоль (как в задании)
+    print("--- 5 последних продуктов ---")
+    for product in latest_products:
+        print(f"ID: {product.id}, Name: {product.name}, Category: {product.category.name}")
+    print("----------------------------")
+
+    # 4. Передаем в шаблон (для будущего использования)
+    context = {
+        'latest_products': latest_products,
+        'title': 'Главная страница'
+    }
+    return render(request, 'catalog/home.html', context)
 
 def home(request):
     return render(request, 'catalog/home.html')
