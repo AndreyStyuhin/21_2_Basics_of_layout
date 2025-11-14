@@ -14,8 +14,6 @@ from django.urls import path
 from pathlib import Path
 from dotenv import load_dotenv
 
-from catalog import views
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -57,12 +55,6 @@ DATABASES = {
     }
 }
 
-urlpatterns = [
-    path('', views.home, name='home'),
-    path('contacts/', views.contacts, name='contacts'),
-    path('category/', views.category, name='category'),  # ✅ добавили
-    path('orders/', views.orders, name='orders'),        # ✅ добавили
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

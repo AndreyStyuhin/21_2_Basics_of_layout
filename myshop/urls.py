@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings # 1. Импорт
 from django.conf.urls.static import static # 2. Импорт
+from catalog import views
+
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),  # ✅ подключаем маршруты приложения
 ]
