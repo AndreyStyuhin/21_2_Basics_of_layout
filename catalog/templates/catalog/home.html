@@ -1,44 +1,41 @@
 {% extends 'catalog/base.html' %}
 
-{% load static %}
+
+{% block title %}Главная{% endblock %}
+
 
 {% block content %}
-
-    <h1 class="h3 mb-3">{{ title }}</h1>
-    <p class="mb-4">Вы находитесь на сайте, предназначенном для продажи товаров.</p>
-
-    <h2 class="mb-3">Последние 5 продуктов</h2>
-
-    {% if latest_products %}
-      <div class="row">
-
-        {% for product in latest_products %}
-          <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
-
-              {% if product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-              {% else %}
-                <img src="{% static 'catalog/placeholder.png' %}" class="card-img-top" alt="Нет изображения">
-              {% endif %}
-
-              <div class="card-body text-center">
+<h2 class="mb-4">Все товары</h2>
+<div class="row g-4">
+    {% for product in page_obj %}
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }}">
+            <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
-                <h1 class="card-title pricing-card-title">{{ product.price }} руб.</h1>
-
-                <ul class="list-unstyled mt-3 mb-4">
-                    <li>{{ product.description|slice:":100" }}...</li>
-                </ul>
-
-                <button type="button" class="btn btn-lg btn-outline-primary">Купить</button>
-              </div>
+                <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                <p class="text-success fw-bold">{{ product.price }} ₽</p>
+                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">Подробнее</a>
             </div>
-          </div>
-        {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-      </div>
-    {% else %}
-      <p>Продукты пока не добавлены.</p>
-    {% endif %}
 
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+        {% endif %}
+
+
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock %}

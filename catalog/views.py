@@ -1,29 +1,22 @@
-from django.shortcuts import render
-# 1. Объединяем импорты моделей в одну строку
+from catalog.forms import ProductForm
 from catalog.models import Product, Category, ContactInfo
+from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import Paginator
+
 
 
 def home(request):
-    """Контроллер главной страницы с выводом последних 5 продуктов."""
+    product_list = Product.objects.all()
+    paginator = Paginator(product_list, 6)  # 6 товаров на страницу
 
-    # 2. Получаем 5 последних продуктов
-    # Мы проверили в Shell, что данные есть. Теперь, когда нет перезаписи, код заработает.
-    latest_products = Product.objects.order_by('-created_at')[:5]
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    # 3. Выводим в консоль (как в задании)
-    print("--- 5 последних продуктов ---")
-    for product in latest_products:
-        # Проверка, что продукт имеет категорию (мы это уже подтвердили)
-        category_name = product.category.name if product.category else 'Нет категории'
-        print(f"ID: {product.id}, Name: {product.name}, Category: {category_name}")
-    print("----------------------------")
+    return render(request, 'catalog/home.html', {
+        'page_obj': page_obj,
+        'title': 'Главная страница',
+    })
 
-    # 4. Передаем в шаблон
-    context = {
-        'latest_products': latest_products,
-        'title': 'Главная страница'
-    }
-    return render(request, 'catalog/home.html', context)
 
 
 def contacts(request):
@@ -67,3 +60,21 @@ def category(request):
 def orders(request):
     """Контроллер страницы заказов"""
     return render(request, 'catalog/orders.html')
+
+
+def product_detail(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, 'catalog/product_detail.html', {
+        'product': product,
+        'title': product.name
+    })
+
+def product_create(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = ProductForm()
+    return render(request, 'catalog/product_form.html', {'form': form})
