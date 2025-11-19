@@ -1,0 +1,119 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 1,
+  "fields": {
+    "name": "Фрукты",
+    "description": "Свежие фрукты"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 2,
+  "fields": {
+    "name": "Овощи",
+    "description": "Свежие овощи"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 3,
+  "fields": {
+    "name": "Молочные продукты",
+    "description": "Из цельного молока"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 4,
+  "fields": {
+    "name": "Фрукты",
+    "description": "Свежие фрукты"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 5,
+  "fields": {
+    "name": "Овощи",
+    "description": "Свежие овощи"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 6,
+  "fields": {
+    "name": "Яблоко \\\"Голден\\\"",
+    "description": "Сочное"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 7,
+  "fields": {
+    "name": "Воды",
+    "description": "Вода очищенная питьевая"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "name": "Яблоко \"Голден\"",
+    "description": "Сочное",
+    "image": "",
+    "category": 1,
+    "price": "160.00",
+    "created_at": "2025-11-14T10:38:02.329Z",
+    "updated_at": "2025-11-14T10:41:31.900Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 2,
+  "fields": {
+    "name": "Картофель \"Молодой\"",
+    "description": "Рассыпчатый",
+    "image": "",
+    "category": 2,
+    "price": "80.00",
+    "created_at": "2025-11-14T10:38:02.334Z",
+    "updated_at": "2025-11-14T10:38:02.334Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 3,
+  "fields": {
+    "name": "Молоко \"Фермерское\"",
+    "description": "3.2%",
+    "image": "",
+    "category": 3,
+    "price": "120.00",
+    "created_at": "2025-11-14T10:38:02.336Z",
+    "updated_at": "2025-11-14T10:38:02.336Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 4,
+  "fields": {
+    "name": "Вода питьевая",
+    "description": "Горный ручей",
+    "image": "",
+    "category": 7,
+    "price": "100.00",
+    "created_at": "2025-11-14T11:17:22.545Z",
+    "updated_at": "2025-11-14T11:17:22.545Z"
+  }
+},
+{
+  "model": "catalog.contactinfo",
+  "pk": 1,
+  "fields": {
+    "address": "Оловянная",
+    "phone": "+79145083800",
+    "email": "ndreyst@olovyannaya.ru"
+  }
+}
+]

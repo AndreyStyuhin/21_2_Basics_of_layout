@@ -1,80 +1,98 @@
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from catalog.forms import ProductForm
 from catalog.models import Product, Category, ContactInfo
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator
+
+class ProductListView(ListView):
+    """
+    Главная страница. Выводит список товаров с пагинацией.
+    """
+    model = Product
+    template_name = 'catalog/home.html'
+    context_object_name = 'page_obj'  # Чтобы не менять цикл в шаблоне home.html
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Главная страница'
+        return context
 
 
+class ContactView(TemplateView):
+    """
+    Страница контактов. Обрабатывает GET (отображение) и POST (обратная связь).
+    """
+    template_name = 'catalog/contacts.html'
 
-def home(request):
-    product_list = Product.objects.all()
-    paginator = Paginator(product_list, 6)  # 6 товаров на страницу
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Получаем контактные данные (первую запись)
+        context['contact_data'] = ContactInfo.objects.first()
+        context['title'] = 'Контакты'
+        return context
 
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, 'catalog/home.html', {
-        'page_obj': page_obj,
-        'title': 'Главная страница',
-    })
-
-
-
-def contacts(request):
-    """Контроллер страницы контактов с обработкой POST-формы."""
-
-    # Получаем контактную информацию (берем первую запись)
-    contact_data = ContactInfo.objects.first()
-
-    context = {
-        'contact_data': contact_data,
-        'title': 'Контакты'
-    }
-
-    if request.method == "POST":
+    def post(self, request, *args, **kwargs):
+        # Получаем данные из POST-запроса
         name = request.POST.get('user_name')
         email = request.POST.get('user_email')
         message = request.POST.get('user_message')
 
-        # Обновленная логика вывода в консоль
+        # Логика вывода в консоль (как было в FBV)
         print(f"--- Сообщение с контактов ---")
         print(f"Имя: {name}, Email: {email}")
         print(f"Сообщение: {message}")
         print("----------------------------")
 
+        # Формируем контекст для ответа (остаемся на той же странице)
+        context = self.get_context_data(**kwargs)
         context.update({
             'success': True,
             'name': name,
         })
-        # Остаемся на странице контактов, передавая информацию об успехе
-        return render(request, 'catalog/contacts.html', context)
-
-    # Для GET-запроса возвращаем страницу с контактными данными
-    return render(request, 'catalog/contacts.html', context)
+        return self.render_to_response(context)
 
 
-def category(request):
-    """Контроллер страницы категорий"""
-    return render(request, 'catalog/category.html')
+class CategoryListView(ListView):
+    """
+    Страница категорий.
+    """
+    model = Category
+    template_name = 'catalog/category.html'
+    context_object_name = 'categories'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Проверяем GET-параметр category для фильтрации товаров (логика из шаблона)
+        category_pk = self.request.GET.get('category')
+        if category_pk:
+            context['products'] = Product.objects.filter(category_id=category_pk)
+        return context
 
 
-def orders(request):
-    """Контроллер страницы заказов"""
-    return render(request, 'catalog/orders.html')
+class OrdersView(TemplateView):
+    """Страница заказов (пока просто шаблон)"""
+    template_name = 'catalog/orders.html'
 
 
-def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    return render(request, 'catalog/product_detail.html', {
-        'product': product,
-        'title': product.name
-    })
+class ProductDetailView(DetailView):
+    """
+    Детальный просмотр товара.
+    """
+    model = Product
+    template_name = 'catalog/product_detail.html'
 
-def product_create(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = ProductForm()
-    return render(request, 'catalog/product_form.html', {'form': form})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.object.name
+        return context
+
+
+class ProductCreateView(CreateView):
+    """
+    Создание нового товара.
+    """
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    # Используем reverse_lazy для перенаправления, так как URL еще не загружены при инициализации класса
+    success_url = reverse_lazy('home')
