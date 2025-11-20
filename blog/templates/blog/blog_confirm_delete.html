@@ -1,0 +1,25 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Удаление статьи{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow text-center">
+            <div class="card-body p-5">
+                <h3 class="card-title text-danger mb-4">Удаление статьи</h3>
+                <p class="card-text fs-5">
+                    Вы уверены, что хотите удалить статью <strong>"{{ object.title }}"</strong>?
+                </p>
+                <p class="text-muted">Это действие нельзя отменить.</p>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg px-4">Да, удалить</button>
+                    <a href="{% url 'blog:view' object.pk %}" class="btn btn-secondary btn-lg px-4">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

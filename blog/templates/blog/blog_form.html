@@ -1,0 +1,27 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}
+    {% if object %}Редактирование статьи{% else %}Новая статья{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">
+            {% if object %}Редактирование статьи{% else %}Создание новой статьи{% endif %}
+        </h2>
+        
+        <form method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm bg-light">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">
+                    {% if object %}Сохранить изменения{% else %}Опубликовать{% endif %}
+                </button>
+                <a href="{% url 'blog:list' %}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

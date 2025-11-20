@@ -21,6 +21,23 @@
     </div>
     {% endfor %}
 </div>
+{% if latest_articles %}
+    <h3 class="mb-3">Свежее в блоге</h3>
+    <div class="row mb-5">
+        {% for article in latest_articles %}
+        <div class="col-md-4">
+            <div class="card h-100 border-primary mb-3" style="max-width: 18rem;">
+                <div class="card-header bg-transparent border-primary">{{ article.created_at|date:"d.m.Y" }}</div>
+                <div class="card-body text-primary">
+                    <h5 class="card-title"><a href="{% url 'blog:view' article.pk %}" class="text-decoration-none">{{ article.title }}</a></h5>
+                    <p class="card-text text-dark">{{ article.content|truncatechars:50 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <hr class="mb-4">
+{% endif %}
 
 
 <nav aria-label="Page navigation" class="mt-4">
