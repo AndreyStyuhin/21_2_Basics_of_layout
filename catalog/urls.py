@@ -9,7 +9,7 @@ from catalog.views import (
     ProductCreateView
 )
 
-app_name = CatalogConfig.name
+# app_name = CatalogConfig.name
 
 urlpatterns = [
     path('', ProductListView.as_view(), name='home'),

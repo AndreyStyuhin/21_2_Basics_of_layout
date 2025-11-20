@@ -22,9 +22,9 @@ from catalog import views
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('', include('catalog.urls')),  # ✅ подключаем маршруты приложения
+    path('', include('catalog.urls')),
+    path('blog/', include('blog.urls', namespace='blog')),
 ]
 # 3. Добавляем раздачу медиа
 if settings.DEBUG:

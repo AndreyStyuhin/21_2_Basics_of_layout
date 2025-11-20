@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from catalog.forms import ProductForm
 from catalog.models import Product, Category, ContactInfo
+from blog.models import Blog
+
 
 class ProductListView(ListView):
     """
@@ -15,6 +17,9 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Главная страница'
+        # Добавляем 3 последние опубликованные статьи
+        context['latest_articles'] = Blog.objects.filter(is_published=True).order_by('-created_at')[:3]
+
         return context
 
 

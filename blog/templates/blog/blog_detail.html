@@ -1,0 +1,36 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-3">{{ object.title }}</h1>
+            
+            <div class="text-muted mb-4 d-flex justify-content-between">
+                <span>Опубликовано: {{ object.created_at|date:"d E Y" }}</span>
+                <span>Просмотров: <span class="badge bg-secondary">{{ object.views_count }}</span></span>
+            </div>
+
+            {% if object.preview %}
+                <img src="{{ object.preview.url }}" class="img-fluid rounded mb-4 w-100" alt="{{ object.title }}">
+            {% endif %}
+
+            <div class="article-content fs-5 mb-5">
+                {{ object.content|linebreaks }}
+            </div>
+
+            <hr>
+            
+            <div class="d-flex justify-content-between mb-5">
+                <a href="{% url 'blog:list' %}" class="btn btn-secondary">← Назад к списку</a>
+                <div class="btn-group">
+                    <a href="{% url 'blog:edit' object.pk %}" class="btn btn-warning">Редактировать</a>
+                    <a href="{% url 'blog:delete' object.pk %}" class="btn btn-danger">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
